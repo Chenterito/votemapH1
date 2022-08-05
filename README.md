@@ -14,3 +14,7 @@ Copy the folder ""votemapH1" into "h1-mod\scripts" of your server folder.
 Add or remove maps in <code>maptovote</code>, as shown in the example, separated by a space.<br>
 Add or remove game modes in <code>dsrtovotate</code>, as shown in the example, separated by a space.<br>
 Modify the time to vote in <code>time_to_vote</code>.<br>
+
+# Disclaimer
+
+The design of the votemap is not mine, I found it on google in a gsc version of COD4, I just adapted it to work in H1-MOD, credits to whom it corresponds

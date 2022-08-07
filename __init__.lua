@@ -3,6 +3,7 @@ if game:getdvar("gamemode") ~= "mp" then -- If its not on multiplayer then don't
 end
 
 playerslistvotemap = {}
+votemapRunning = 0
 
 game:precacheshader("gradient_fadein")
 game:precacheshader("gradient")
@@ -55,9 +56,11 @@ function player_connected(player)
     player:onnotifyonce("disconnect", function()
         removeplayer(player)
     end)
-    --level:onnotify("start_vote",function() player:PlayerVote() end)
-	if(game:isdefined(player == 1) and  game:isbot(player) == 0) then
+	if(game:isdefined(player == 1) and  game:isbot(player) == 0 and votemapRunning == 0) then
 		table.insert(playerslistvotemap, player)
+        player:onnotifyonce("start_vote", function()
+            player:PlayerVote()
+        end)
     end
 end
 ------------
@@ -67,6 +70,7 @@ function startvotemap()
 
     maprotation = maptovote:split(" ")
     dsrrotation = dsrtovotate:split(" ")
+    votemapRunning = 1
 
     windowheight = 180
     windowwidth  = 500
@@ -392,13 +396,13 @@ end
 function votemapPlayers()
     for i = 1,  #playerslistvotemap do     
 		if(game:isdefined(playerslistvotemap[i] == 1)) then
-			playerslistvotemap[i]:PlayerVote()
+            playerslistvotemap[i]:notify("start_vote")
 		end
     end
 end
 ----------------
 function entity:PlayerVote() 
-  local maps = voteablemaps
+    local maps = voteablemaps
 	self.howto = addTextHud( self, 0, (windowheight / 2) + 5, 1, "center", "top", "center", "middle", 2.4, 101 )
 	self.howto:fadeIn(0.3)
 	self.howto:settext("Voting started")
@@ -440,16 +444,7 @@ function entity:PlayerVote()
         end
     end)
     self:onnotifyonce("startingVoted", function() 
-        self.howto:fadeOut(1)  
-        
-        local playervotemonitor = game:oninterval(function()
-            self:allowspectateteam( "allies", 0 )
-            self:allowspectateteam( "axis", 0 )
-            self:allowspectateteam( "freelook", 0 )
-            self:allowspectateteam( "none", 1 )
-        end, 100)
-        playervotemonitor:endon(level, "end_vote")
-        playervotemonitor:endon(self, "disconnect")
+        self.howto:fadeOut(1)
     end)
 
     local monitorplayerbuttonpressed = game:oninterval(function()

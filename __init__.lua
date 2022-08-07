@@ -34,7 +34,7 @@ final_killcam = game:detour("_id_A78D", "endfinalkillcam", function() -- maps/mp
         level:notify("end_vote") -- notification calling finalkillcam
     end 
 end)
-------------
+
 function tablefind(tab, el)
     for index, value in pairs(tab) do
         if value == el then
@@ -132,10 +132,6 @@ function startvotemap()
 	hudA[7]:fadeIn( 0.3)
 
 
-    looptime = game:oninterval(function()
-        playSoundOnAllPlayers( "ui_mp_timer_countdown" )       
-    end, 1000)
-
     loopfadein = game:oninterval(function()
         hudA[5]:fadeovertime(0.9)
 		hudA[5].alpha = 0.5
@@ -150,7 +146,6 @@ function startvotemap()
         hudA[4].alpha = 1
     end, 1000)	
 
-    looptime:endon(level, "end_vote")
     loopfadein:endon(level, "end_vote")
     loopfadein2:endon(level, "end_vote")
 
@@ -169,6 +164,7 @@ function startvotemap()
 	end)
 	
 	level:onnotify("end_vote", function() postVote() end) -- Show winning map and define next map/mode
+    level:onnotify("end_vote", function() endvotemapPlayers() end)
 	
     updatevotesmonitor = game:oninterval(function() -- wait time_to_vote seg to vote
 
@@ -223,13 +219,6 @@ function startvotemap()
 end
 ----------------
 function postVote()
-    for i = 1, #playerslistvotemap do            
-        if(game:isdefined(playerslistvotemap[i] == 1) and game:isdefined(playerslistvotemap[i].mapvote_selection) == 1) then
-            game:ontimeout(function()
-                playerslistvotemap[i].mapvote_selection:fadeOut(0.5)
-            end,0)
-        end
-    end
     
     hudA[6]:fadeOut(0.5)
     hudA[5]:fadeOut(0.5)
@@ -400,8 +389,21 @@ function votemapPlayers()
 		end
     end
 end
+-------------------------
+function endvotemapPlayers()
+    for i = 1,  #playerslistvotemap do     
+		if(game:isdefined(playerslistvotemap[i] == 1)) then
+            playerslistvotemap[i]:notify("end_vote")
+		end
+    end
+end
 ----------------
 function entity:PlayerVote() 
+
+    local looptime = game:oninterval(function()
+        self:playlocalsound("ui_mp_timer_countdown")
+    end, 1000)
+    looptime:endon(level, "end_vote")
     local maps = voteablemaps
 	self.howto = addTextHud( self, 0, (windowheight / 2) + 5, 1, "center", "top", "center", "middle", 2.4, 101 )
 	self.howto:fadeIn(0.3)
@@ -444,7 +446,7 @@ function entity:PlayerVote()
         end
     end)
     self:onnotifyonce("startingVoted", function() 
-        self.howto:fadeOut(1)
+        self.howto:fadeOut(1)  
     end)
 
     local monitorplayerbuttonpressed = game:oninterval(function()
@@ -453,6 +455,11 @@ function entity:PlayerVote()
         end
     end, 10)
     monitorplayerbuttonpressed:endon(self, "startingVoted")
+    self:onnotifyonce("end_vote", function()
+        if(game:isdefined(self) == 1 and game:isdefined(self.mapvote_selection) == 1) then
+                self.mapvote_selection:fadeOut(0.5)
+        end
+    end)
 end
 ------------
 function entity:affectElement(type, time, value) --HUD Common by DoktorSAS

@@ -459,6 +459,9 @@ function entity:PlayerVote()
         if(game:isdefined(self) == 1 and game:isdefined(self.mapvote_selection) == 1) then
                 self.mapvote_selection:fadeOut(0.5)
         end
+	if(game:isdefined(self) == 1 and game:isdefined(self.howto) == 1) then -- In case the player has not voted
+            self.howto:fadeOut(1)  
+        end
     end)
 end
 ------------

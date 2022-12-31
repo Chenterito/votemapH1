@@ -16,14 +16,14 @@ time_to_vote = 20 -- seg
 time_to_killcam = 3000 ---miliseg Needed for you to present the winning map/mode
 
 local final_killcam = nil
-final_killcam = game:detour("_id_A78D", "endfinalkillcam", function() -- maps/mp/gametypes/_damage = _id_A78D -- 
+final_killcam = game:detour("maps/mp/gametypes/_damage", "endfinalkillcam", "endfinalkillcam", function() -- maps/mp/gametypes/_damage = _id_A78D -- 
     level:onnotifyonce("end_vote", function()
         game:ontimeout(function()
             final_killcam.invoke() -- this calls the original, and lets the notify go through
         end, time_to_killcam)
     end)
 
-    if( game:scriptcall("maps/mp/_utility", "_id_A1CA") == 1 and #playerslistvotemap >= 1) then        -- Votemap will run only if there are a minimum number of players and waslastround
+    if( game:scriptcall("maps/mp/_utility", "waslastround") == 1 and #playerslistvotemap >= 1) then        -- Votemap will run only if there are a minimum number of players and waslastround
         startvotemap() -- Once the vote is finished, it notifies by calling the finalkillcam
     else -- Set a random map
         time_to_killcam = 0
